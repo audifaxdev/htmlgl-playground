@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTML GL filters demo</title>
+    <meta name="viewport" content="width=1024 maximum-scale=1.0 minimum-scale=1.0 initial-scale=1.0, user-scalable=no" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            background-color: transparent;
+        }
+
+        html-gl {
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+        }
+
+        #slider {
+            /*background-color: red;*/
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .slide {
+            display: block;
+            width: 500px;
+            height: 500px;
+            position: absolute;
+            opacity: 0;
+            z-index: 0;
+        }
+
+        .current {
+            opacity: 1;
+        }
+
+        .fadeOut {
+            animation: fadeOut 5s;
+        }
+
+        .fadeIn {
+            animation: fadeIn 5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!--<html-gl>-->
+        <div id="slider">
+            <img class="slide current" src=pikachu.png alt="">
+            <img class="slide" src="mew.png" alt="">
+            <img class="slide" src="dracoloss.png" alt="">
+        </div>
+    <!--</html-gl>-->
+    <div id="scoreDisplay"></div>
+
+    <!--<img src="http://lorempixel.com/800/600" alt="">-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-gl/0.3.1/htmlgl.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-gl/0.3.1/htmlgl-effects.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/plugins/CSSPlugin.min.js"></script>
+
+    <script>
+        function Slider() {
+
+            var self = this;
+            self.pixelateSizeInterpolate = d3.interpolateNumber(1, 16);
+
+            self.renderer = HTMLGL.renderer;
+
+            self.pixelateFilter = new PIXI.filters.PixelateFilter();
+            self.pixelateFilter.size.x = 1;
+            self.pixelateFilter.size.y = 1;
+
+            self.glView = HTMLGL.document;
+
+            self.startTime = new Date().getTime();
+
+            self.slides = $('.slide');
+            self.currentIndex = 0;
+
+            this.currentSlide = function () {
+                return self.slides.length > 0 ? self.slides[self.currentIndex] : null;
+            };
+
+            self.nextSlide = function () {
+
+                var tl = new TimelineLite();
+
+                tl.to(self.pixelateFilter.size, 2.5, {x:16, y:16}).to(self.pixelateFilter.size, 2.5, {x:1, y:1});
+
+                self.oldSlide = self.currentSlide();
+
+                self.currentIndex = (self.currentIndex + 1) % self.slides.length;
+
+                //console.log('nextSlide -> currentIndex', self.currentIndex);
+                self.newSlide = self.currentSlide();
+
+                if (self.oldSlide) {
+                    $(self.oldSlide).css('animation', 'fadeOut 5s');
+//                    TweenLite.fromTo(
+//                        self.oldSlide, 5,
+//                        {
+//                            css: {opacity: 1}
+//                        },
+//                        {
+//                            css: {opacity: 0},
+//                            onComplete: function() {
+//                                $(self.oldSlide).toggleClass('current');
+//                    }});
+                }
+                $(self.newSlide).css('animation', 'fadeIn 5s');
+//                TweenLite.fromTo(
+//                        self.newSlide, 5,
+//                        {css: {opacity: 0}},
+//                        {css: {opacity: 1},
+//                            onComplete: function() {
+//                                $(self.newSlide).toggleClass('current');
+//                            }});
+            };
+
+            self.render = function () {
+                if (self.newSlide && self.oldSlide) {
+//                    console.log($(self.oldSlide).css('opacity'));
+//                    console.log($(self.newSlide).css('opacity'));
+                }
+
+                self.glView.filters = [self.pixelateFilter];
+                self.renderer.render(self.glView);
+                requestAnimationFrame( self.render );
+            };
+
+//            requestAnimationFrame( self.render );
+
+            setTimeout(this.nextSlide, 1000);
+            setInterval(this.nextSlide, 5000);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var slider = new Slider();
+        });
+
+    </script>
+</body>
+</html>
