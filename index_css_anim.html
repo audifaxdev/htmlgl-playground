@@ -1,7 +1,9 @@
+<!--I found out while playing around, that when the element's opacity changed in the background-->
+<!--Props to this project pushing the limit of what's possible in our browser!-->
 <!DOCTYPE html>
 <html>
 <head>
-    <title>HTML GL filters demo</title>
+    <title>HTML GL Css Anims</title>
     <meta name="viewport" content="width=1024 maximum-scale=1.0 minimum-scale=1.0 initial-scale=1.0, user-scalable=no" />
     <style>
         * {
@@ -66,13 +68,14 @@
     </style>
 </head>
 <body>
-    <!--<html-gl>-->
+    <html-gl>
         <div id="slider">
             <img class="slide current" src=pikachu.png alt="">
             <img class="slide" src="mew.png" alt="">
             <img class="slide" src="dracoloss.png" alt="">
         </div>
-    <!--</html-gl>-->
+    </html-gl>
+    <h1>Frame buffer won't update</h1>
     <div id="scoreDisplay"></div>
 
     <!--<img src="http://lorempixel.com/800/600" alt="">-->
@@ -96,6 +99,7 @@
             self.pixelateFilter.size.y = 1;
 
             self.glView = HTMLGL.document;
+//            console.log(self.renderer);
 
             self.startTime = new Date().getTime();
 
@@ -121,25 +125,11 @@
 
                 if (self.oldSlide) {
                     $(self.oldSlide).css('animation', 'fadeOut 5s');
-//                    TweenLite.fromTo(
-//                        self.oldSlide, 5,
-//                        {
-//                            css: {opacity: 1}
-//                        },
-//                        {
-//                            css: {opacity: 0},
-//                            onComplete: function() {
-//                                $(self.oldSlide).toggleClass('current');
-//                    }});
                 }
-                $(self.newSlide).css('animation', 'fadeIn 5s');
-//                TweenLite.fromTo(
-//                        self.newSlide, 5,
-//                        {css: {opacity: 0}},
-//                        {css: {opacity: 1},
-//                            onComplete: function() {
-//                                $(self.newSlide).toggleClass('current');
-//                            }});
+
+                if (self.newSlide) {
+                    $(self.newSlide).css('animation', 'fadeIn 5s');
+                }
             };
 
             self.render = function () {
@@ -153,7 +143,7 @@
                 requestAnimationFrame( self.render );
             };
 
-//            requestAnimationFrame( self.render );
+            requestAnimationFrame( self.render );
 
             setTimeout(this.nextSlide, 1000);
             setInterval(this.nextSlide, 5000);
